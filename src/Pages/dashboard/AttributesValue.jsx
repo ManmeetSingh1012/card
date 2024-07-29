@@ -2,106 +2,60 @@ import { useParams } from "react-router-dom";
 import CategoryCard from "../../components/CategoryCard";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { add } from "../../Redux/authslice";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { set, useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default function ChildCategory() {
-  const { id, child_id } = useParams();
-  console.log(child_id);
+export default function AttributesValue() {
+  const { id } = useParams();
+  console.log(id);
+
+  const notify = () => toast("Data Updated Successfully !");
+
   const navigate = useNavigate();
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [subcategories, setSubCategories] = useState([]);
   const [change, setChange] = useState(false);
-  const [flow, setFlow] = useState([]);
-  const [parentName, setParentName] = useState("");
+  const [flow, setFlow] = useState(null);
+  const [cardcount, setcardcount] = useState(0);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchAttributeValues = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_LOCAL_LINK}/api//${id}`
+        );
+        const data = response.data;
+
+        console.log(data);
+        setSubCategories(response.data[1]);
+
+        setFlow(response.data[0]);
+        setcardcount(data.length);
+        //dispatch(add(response.data[0]));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchAttributeValues();
+  }, [change]);
+
+  const [newName, setNewName] = useState("");
 
   const [card, setcardata] = useState([]);
   const [newcard, setnewcard] = useState([]);
 
-  const [cardcount, setcardcount] = useState(0);
   const [editingItem, setEditingItem] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: "",
     description: "",
     imageUrl: "",
   });
-
-  const fetchParentName = async () => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${id}`
-      );
-
-      setParentName(response.data[0].name);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${child_id}`
-        );
-
-        console.log(response.data);
-        setSubCategories(response.data[1]);
-
-        console.log(response.data[1].length);
-        setFlow([response.data[0]]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchParentName();
-
-    fetchCategories();
-  }, [change]);
-
-  const savedata = async (data) => {
-    console.log("fetching data", data);
-    data.sequence = cardcount + 1;
-    data.parent_id = child_id;
-    try {
-      await axios
-        .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addCategory`, data)
-        .then((response) => {
-          const data = response.data;
-          console.log(data);
-          // setcardata(data);
-          setcardcount(data.length);
-          setChange(!change);
-
-          setError("");
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
-        });
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
-    }
-  };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    control,
-    getValues,
-  } = useForm({});
-
-  const addnewcards = () => {
-    setnewcard([...newcard, { id: newcard.length + 1, name: newName }]);
-    setNewName("");
-  };
-
   const deletenewcardscount = () => {
     if (newcard.length > 0) {
       setnewcard([...newcard].slice(0, newcard.length - 1));
@@ -134,6 +88,8 @@ export default function ChildCategory() {
     form.append("description", editFormData.description);
     form.append("category_image", file);
 
+    console.log(form.data);
+
     try {
       await axios
         .post(
@@ -141,7 +97,7 @@ export default function ChildCategory() {
           form
         )
         .then((response) => {
-          console.log(response.data.msg);
+          console.log(response.data);
           setChange(!change);
           //setLoading(false);
         })
@@ -156,6 +112,7 @@ export default function ChildCategory() {
     }
 
     console.log("Saving:", editFormData);
+    notify();
     setEditingItem(null);
   };
 
@@ -167,8 +124,34 @@ export default function ChildCategory() {
     setEditingItem(null);
   };
 
+  const savedata = async (data) => {
+    console.log("fetching data");
+
+    data.parent_id = id;
+
+    try {
+      await axios
+        .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addCategory`, data)
+        .then((response) => {
+          const data = response.data;
+          console.log(data);
+          // setcardata(data);
+          setcardcount(data.length);
+          setChange(!change);
+
+          setError("");
+          setLoading(false);
+        })
+        .catch((error) => {
+          setError(error.message);
+          setLoading(false);
+        });
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
   const [isAdding, setIsAdding] = useState(false);
-  const [newName, setNewName] = useState("");
 
   const addcards = () => {
     const data = {
@@ -186,6 +169,11 @@ export default function ChildCategory() {
     }
   };
 
+  const addnewcards = () => {
+    setnewcard([...newcard, { id: newcard.length + 1, name: newName }]);
+    setNewName("");
+    console.log("new card");
+  };
   const [file, setfile] = useState(null);
 
   const handleImageChange = (e) => {
@@ -208,10 +196,11 @@ export default function ChildCategory() {
     };
     fileInput.click();
   };
+
   return (
-    <div className="App bg-slate-100 h-screen  pt-10">
-      <div className="w-4/5 mx-auto">
-        {Object.values(flow).map((item, i) => (
+    <div className="App bg-slate-100  pt-10">
+      {flow ? (
+        <div className="w-4/5 mx-auto">
           <nav className="flex" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
               <li className="inline-flex items-center">
@@ -248,46 +237,21 @@ export default function ChildCategory() {
                       d="m1 9 4-4-4-4"
                     />
                   </svg>
-                  <Link
-                    to={`/categories/childcategory/${id}`}
-                    className="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
-                  >
-                    {parentName}
-                  </Link>
-                </div>
-              </li>
-              <li aria-current="page">
-                <div className="flex items-center">
-                  <svg
-                    className="w-3 h-3 text-gray-400 mx-1"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m1 9 4-4-4-4"
-                    />
-                  </svg>
                   <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                    {item.name}
+                    {flow.name}
                   </span>
                 </div>
               </li>
             </ol>
           </nav>
-        ))}
-      </div>
-
+        </div>
+      ) : null}
       <div>
-        <div className="w-4/5 rounded-lg overflow p-3 mx-auto shadow-lg  bg-white border border-gray-300">
+        <div className="w-4/5 rounded-lg p-3 overflow-hidden mx-auto shadow-lg  bg-white border border-gray-300">
           <CategoryCard
             category={subcategories}
-            child_id={child_id}
+            id={id}
+            flow={flow}
             setChange={setChange}
             change={change}
             handleEdit={handleEdit}
@@ -331,7 +295,6 @@ export default function ChildCategory() {
             </tbody>
           </table>
         </div>
-
         {editingItem && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-hidden h-full w-full flex items-center justify-center z-50">
             <div className="relative mx-auto p-5 border w-full max-w-md max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
@@ -436,7 +399,7 @@ export default function ChildCategory() {
         )}
       </div>
 
-      <div className="w-4/5 mx-auto pt-4">
+      <div className="w-4/5 mx-auto py-5">
         <div
           className="p-5 border-4 border-dotted border-gray-300 rounded-lg flex items-center justify-center h-2 w-full cursor-pointer hover:bg-gray-100"
           onClick={addnewcards}

@@ -6,27 +6,36 @@ import { useDispatch } from "react-redux";
 import { add } from "../../Redux/authslice";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ChildCategory() {
   const { id } = useParams();
   console.log(id);
 
-  const navigate = useNavigate();
+  const notify = () => toast("Data Updated Successfully !");
 
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [subcategories, setSubCategories] = useState([]);
   const [change, setChange] = useState(false);
   const [flow, setFlow] = useState(null);
+  const [cardcount, setcardcount] = useState(0);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          `http://159.65.144.232:3400/api/childCategories/${id}`
+          `${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${id}`
         );
+        const data = response.data;
+
+        console.log(data);
         setSubCategories(response.data[1]);
-        console.log(response.data[0].name);
-        console.log(response.data[1]);
+
         setFlow(response.data[0]);
+        setcardcount(data.length);
         //dispatch(add(response.data[0]));
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -58,7 +67,14 @@ export default function ChildCategory() {
   const handleEdit = (item) => {
     console.log("Editing:", item);
     setEditingItem(item);
-    setEditFormData({ name: item.name, description: item.description });
+    console.log("Editing:", item);
+    const image_url =
+      `${import.meta.env.VITE_LOCAL_LINK}/uploads/` + item.category_image;
+    setEditFormData({
+      name: item.name,
+      description: item.description,
+      imageUrl: image_url,
+    });
   };
 
   const handleSave = async () => {
@@ -72,6 +88,8 @@ export default function ChildCategory() {
     form.append("description", editFormData.description);
     form.append("category_image", file);
 
+    console.log(form.data);
+
     try {
       await axios
         .post(
@@ -79,7 +97,7 @@ export default function ChildCategory() {
           form
         )
         .then((response) => {
-          console.log(response.data.msg);
+          console.log(response.data);
           setChange(!change);
           //setLoading(false);
         })
@@ -94,6 +112,7 @@ export default function ChildCategory() {
     }
 
     console.log("Saving:", editFormData);
+    notify();
     setEditingItem(null);
   };
 
@@ -108,9 +127,11 @@ export default function ChildCategory() {
   const savedata = async (data) => {
     console.log("fetching data");
 
+    data.parent_id = id;
+
     try {
       await axios
-        .post(`${import.meta.env.LOCAL_LINK}/api/addCategory`, data)
+        .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addCategory`, data)
         .then((response) => {
           const data = response.data;
           console.log(data);
@@ -177,7 +198,7 @@ export default function ChildCategory() {
   };
 
   return (
-    <div className="App bg-slate-100 h-svh pt-10">
+    <div className="App bg-slate-100 h-screen pt-10">
       {flow ? (
         <div className="w-4/5 mx-auto">
           <nav className="flex" aria-label="Breadcrumb">
@@ -274,13 +295,13 @@ export default function ChildCategory() {
             </tbody>
           </table>
         </div>
-
         {editingItem && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-hidden h-full w-full flex items-center justify-center z-50">
+            <div className="relative mx-auto p-5 border w-full max-w-md max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
               <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
                 Edit Item
               </h3>
+
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -378,7 +399,7 @@ export default function ChildCategory() {
         )}
       </div>
 
-      <div className="w-4/5 mx-auto pt-4">
+      <div className="w-4/5 mx-auto py-5">
         <div
           className="p-5 border-4 border-dotted border-gray-300 rounded-lg flex items-center justify-center h-2 w-full cursor-pointer hover:bg-gray-100"
           onClick={addnewcards}

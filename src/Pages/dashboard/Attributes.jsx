@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-export default function Home() {
+export default function Attributes() {
   const [loading, setLoading] = useState(false);
   const [card, setcardata] = useState([]);
   const [newcard, setnewcard] = useState([]);
@@ -17,8 +17,7 @@ export default function Home() {
   const [editingItem, setEditingItem] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: "",
-    description: "",
-    imageUrl: "",
+    display_type: "text",
   });
 
   useEffect(() => {
@@ -39,7 +38,7 @@ export default function Home() {
     console.log("fetching data");
     try {
       await axios
-        .get(`${import.meta.env.VITE_LOCAL_LINK}/api/parentCategories`)
+        .get(`${import.meta.env.VITE_LOCAL_LINK}/api/getAttributes`)
         .then((response) => {
           const data = response.data;
           console.log(data);
@@ -59,12 +58,11 @@ export default function Home() {
     }
   };
 
-  // http://159.65.144.232:3400/api/addParentCategory
   const savedata = async (data) => {
     console.log("fetching data");
     try {
       await axios
-        .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addCategory`, data)
+        .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addAttribute`, data)
         .then((response) => {
           const data = response.data;
           console.log(data);
@@ -86,7 +84,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log("etching data", import.meta.env.VITE_LOCAL_LINK);
+    console.log("Fetching data", import.meta.env.VITE_LOCAL_LINK);
     fetchdata();
   }, [change]);
 
@@ -116,20 +114,17 @@ export default function Home() {
     console.log("Editing:", item);
     setEditingItem(item);
     console.log("Editing:", item);
-    const image_url =
-      `${import.meta.env.VITE_LOCAL_LINK}/uploads/` + item.category_image;
-    console.log("Image URL:", image_url);
+
     setEditFormData({
       name: item.name,
-      description: item.description,
-      imageUrl: image_url,
+      display_type: item.display_type,
     });
   };
 
   const handleDelete = async (id) => {
     try {
       await axios
-        .delete(`${import.meta.env.VITE_LOCAL_LINK}/api/deleteCategory/${id}`)
+        .delete(`${import.meta.env.VITE_LOCAL_LINK}/api/deleteAttribute/${id}`)
         .then((response) => {
           setError("");
           setchange(!change);
@@ -152,21 +147,17 @@ export default function Home() {
   };
 
   const handleSave = async () => {
+    console.log("Saving:", editFormData);
+
     // Implement your save logic here
-    const id = editingItem.id;
-    console.log("This is my id", id);
-
-    const form = new FormData();
-
-    form.append("name", editFormData.name);
-    form.append("description", editFormData.description);
-    form.append("category_image", file);
+    /*console.log("Saving:", editFormData);
 
     try {
+      console.log(`Sengind dtsta ${form}`);
       await axios
         .post(
-          `${import.meta.env.VITE_LOCAL_LINK}/api/updateCategory/${id}`,
-          form
+          `${import.meta.env.VITE_LOCAL_LINK}/api/updateAttribute/${id}`,
+          editFormData
         )
         .then((response) => {
           console.log(response.data.msg);
@@ -185,7 +176,7 @@ export default function Home() {
     }
 
     console.log("Saving:", editFormData);
-    setEditingItem(null);
+    setEditingItem(null);*/
   };
 
   const handleInputChange = (e) => {
@@ -218,29 +209,8 @@ export default function Home() {
     }
   };
 
-  const handleImageChange = (e) => {
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = "image/*";
-    fileInput.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        setfile(file);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setEditFormData({
-            ...editFormData,
-            imageUrl: e.target.result,
-          });
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-    fileInput.click();
-  };
-
   return (
-    <div className="bg-slate-100 w-full min-h-screen pt-10">
+    <div className="bg-slate-100 w-full h-screen  pt-10">
       <div className="w-4/5 mx-auto">
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex items-center">
@@ -432,57 +402,62 @@ export default function Home() {
                 />
               </div>
               <div className="mb-4">
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Description
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Display Type
                 </label>
-                <textarea
-                  name="description"
-                  id="description"
-                  value={editFormData.description}
-                  onChange={handleInputChange}
-                  rows="4"
-                  className="mt-1 block w-full pl-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                ></textarea>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Image
-                </label>
-                <div className="mt-1 flex flex-col items-center">
-                  <div className="w-64 h-64 border-2 border-gray-300 border-dashed rounded-lg p-2 flex items-center justify-center">
-                    {editFormData.imageUrl ? (
-                      <img
-                        src={editFormData.imageUrl}
-                        alt="Current"
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    ) : (
-                      <svg
-                        className="w-12 h-12 text-gray-400"
-                        stroke="currentColor"
-                        fill="none"
-                        viewBox="0 0 48 48"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    )}
+                <div className="flex space-x-4">
+                  {/* Changed to flex and added horizontal spacing */}
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="display_type_text"
+                      name="display_type"
+                      value="text"
+                      checked={editFormData.display_type === "text"}
+                      onChange={handleInputChange}
+                      className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                    />
+                    <label
+                      htmlFor="display_type_text"
+                      className="ml-2 block text-sm text-gray-700"
+                    >
+                      Text
+                    </label>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleImageChange}
-                    className="mt-2 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Change Image
-                  </button>
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="display_type_color"
+                      name="display_type"
+                      value="color"
+                      checked={editFormData.display_type === "color"}
+                      onChange={handleInputChange}
+                      className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                    />
+                    <label
+                      htmlFor="display_type_color"
+                      className="ml-2 block text-sm text-gray-700"
+                    >
+                      Color
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="display_type_type"
+                      name="display_type"
+                      value="type"
+                      checked={editFormData.display_type === "type"}
+                      onChange={handleInputChange}
+                      className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                    />
+                    <label
+                      htmlFor="display_type_type"
+                      className="ml-2 block text-sm text-gray-700"
+                    >
+                      Type
+                    </label>
+                  </div>
                 </div>
               </div>
               <div className="mt-4 flex justify-end space-x-2">

@@ -19,7 +19,7 @@ export default function LoginComponent() {
   function onSubmit(formData) {
     console.log(formData);
 
-    const url = "http://159.65.144.232:3400/api/login";
+    const url = `${import.meta.env.VITE_LOCAL_LINK}/api/login`;
     try {
       axios
         .post(url, formData)

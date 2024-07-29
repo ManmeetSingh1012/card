@@ -15,7 +15,13 @@ const ChildCategory = lazy(() => import("./Pages/dashboard/ChildCategory.jsx"));
 
 const Landing = lazy(() => import("./Pages/Landing.jsx"));
 const DefaultPage = lazy(() => import("./Pages/dashboard/Default.jsx"));
-//
+
+const Attributes = lazy(() => import("./Pages/dashboard/Attributes.jsx"));
+
+const AttributesValue = lazy(() =>
+  import("./Pages/dashboard/AttributesValue.jsx")
+);
+
 function App() {
   const [count, setCount] = useState(0);
 
@@ -39,6 +45,13 @@ function App() {
               <Route
                 path="/categories/:id/:child_id"
                 element={<SubChildCategory />}
+              />
+
+              <Route path="/categories/attributes" element={<Attributes />} />
+
+              <Route
+                path="/categories/attributesvalue/:id"
+                element={<AttributesValue />}
               />
             </Route>
           </Route>

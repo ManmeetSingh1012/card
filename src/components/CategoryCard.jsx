@@ -21,13 +21,15 @@ const CategoryCard = ({
   const [editingItem, setEditingItem] = useState(null);
   const [editFormData, setEditFormData] = useState({ name: "" });
 
+  const [error, setError] = useState("");
+
   const handleDelete = async (id) => {
     try {
       await axios
         .delete(`${import.meta.env.VITE_LOCAL_LINK}/api/deleteCategory/${id}`)
         .then((response) => {
           setError("");
-          setchange(!change);
+          setChange(!change);
           console.log(response.data.msg);
           //setLoading(false);
         })
