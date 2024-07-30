@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-export default function Attributes() {
+export default function Qualities() {
   const [loading, setLoading] = useState(false);
   const [card, setcardata] = useState([]);
   const [newcard, setnewcard] = useState([]);
@@ -17,7 +17,6 @@ export default function Attributes() {
   const [editingItem, setEditingItem] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: "",
-    display_type: "", // Changed default to checkbox
   });
 
   useEffect(() => {
@@ -38,7 +37,7 @@ export default function Attributes() {
     console.log("fetching data");
     try {
       await axios
-        .get(`${import.meta.env.VITE_LOCAL_LINK}/api/getAttributes`)
+        .get(`${import.meta.env.VITE_LOCAL_LINK}/api/getProductQuality`)
         .then((response) => {
           const data = response.data;
           console.log(data);
@@ -58,11 +57,12 @@ export default function Attributes() {
     }
   };
 
+  // http://159.65.144.232:3400/api/addParentCategory
   const savedata = async (data) => {
     console.log("fetching data");
     try {
       await axios
-        .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addAttribute`, data)
+        .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addProductQuality`, data)
         .then((response) => {
           const data = response.data;
           console.log(data);
@@ -84,7 +84,7 @@ export default function Attributes() {
   };
 
   useEffect(() => {
-    console.log("Fetching data", import.meta.env.VITE_LOCAL_LINK);
+    console.log("etching data", import.meta.env.VITE_LOCAL_LINK);
     fetchdata();
   }, [change]);
 
@@ -116,16 +116,16 @@ export default function Attributes() {
     console.log("Editing:", item);
 
     setEditFormData({
-      id: item.id,
       name: item.name,
-      display_type: item.display_type,
     });
   };
 
   const handleDelete = async (id) => {
     try {
       await axios
-        .delete(`${import.meta.env.VITE_LOCAL_LINK}/api/deleteAttribute/${id}`)
+        .delete(
+          `${import.meta.env.VITE_LOCAL_LINK}/api/deleteProductQuality/${id}`
+        )
         .then((response) => {
           setError("");
           setchange(!change);
@@ -142,27 +142,15 @@ export default function Attributes() {
     }
   };
 
-  const handleView = (id) => {
-    console.log("View:", id);
-    navigate(`/attributes/attributesvalue/${id}`);
-  };
-
   const handleSave = async () => {
-    console.log("Saving:", editFormData);
-
-    if (editFormData.display_type == "") {
-      editFormData.display_type = "checkbox";
-    }
-
     // Implement your save logic here
-    console.log("Saving Before:", editFormData);
+    const id = editingItem.id;
+    console.log("This is my id", id);
 
     try {
       await axios
         .post(
-          `${import.meta.env.VITE_LOCAL_LINK}/api/updateAttribute/${
-            editFormData.id
-          }`,
+          `${import.meta.env.VITE_LOCAL_LINK}/api/updateProductQuality/${id}`,
           editFormData
         )
         .then((response) => {
@@ -181,7 +169,7 @@ export default function Attributes() {
       //setLoading(false);
     }
 
-    console.log("Saving After:", editFormData);
+    console.log("Saving:", editFormData);
     setEditingItem(null);
   };
 
@@ -196,7 +184,6 @@ export default function Attributes() {
     setEditingItem(null);
   };
 
-  const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState("");
 
   const addcards = () => {
@@ -216,13 +203,13 @@ export default function Attributes() {
   };
 
   return (
-    <div className="bg-slate-100 w-full h-screen  pt-10">
+    <div className="bg-slate-100 w-full min-h-screen pt-10">
       <div className="w-4/5 mx-auto">
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex items-center">
             <li className="inline-flex items-center">
               <Link
-                to="/attributes"
+                to="/qualities"
                 className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
               >
                 <svg
@@ -234,7 +221,7 @@ export default function Attributes() {
                 >
                   <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
                 </svg>
-                Attributes
+                Product Qualities
               </Link>
             </li>
           </ol>
@@ -290,6 +277,7 @@ export default function Attributes() {
                         />
                       </svg>
                     </button>
+
                     <button
                       onClick={() => handleDelete(item.id)}
                       className="text-red-500 hover:text-red-700"
@@ -312,26 +300,6 @@ export default function Attributes() {
                         />
                       </svg>
                     </button>
-                    <button
-                      onClick={() => handleView(item.id)}
-                      className="text-green-500 hover:text-green-700"
-                    >
-                      <svg
-                        class="w-6 h-6 text-gray-800 "
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M3.559 4.544c.355-.35.834-.544 1.33-.544H19.11c.496 0 .975.194 1.33.544.356.35.559.829.559 1.331v9.25c0 .502-.203.981-.559 1.331-.355.35-.834.544-1.33.544H15.5l-2.7 3.6a1 1 0 0 1-1.6 0L8.5 17H4.889c-.496 0-.975-.194-1.33-.544A1.868 1.868 0 0 1 3 15.125v-9.25c0-.502.203-.981.559-1.331ZM7.556 7.5a1 1 0 1 0 0 2h8a1 1 0 0 0 0-2h-8Zm0 3.5a1 1 0 1 0 0 2H12a1 1 0 1 0 0-2H7.556Z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                    </button>
                   </div>
                 </td>
               </tr>
@@ -346,7 +314,7 @@ export default function Attributes() {
             {newcard.map((item, i) => (
               <tr key={item.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {cardcount + 1}
+                  {card.length + 1}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <input
@@ -384,6 +352,7 @@ export default function Attributes() {
             <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
               Edit Item
             </h3>
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -406,25 +375,7 @@ export default function Attributes() {
                   className="mt-1 block w-full pl-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="display_type"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Display Type
-                </label>
-                <select
-                  name="display_type"
-                  id="display_type"
-                  value={editFormData.display_type}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full pl-1 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option value="checkbox">Checkbox</option>
-                  <option value="radio">Radio</option>
-                  <option value="select">Select</option>
-                </select>
-              </div>
+
               <div className="mt-4 flex justify-end space-x-2">
                 <button
                   type="button"

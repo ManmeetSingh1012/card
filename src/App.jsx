@@ -22,6 +22,14 @@ const AttributesValue = lazy(() =>
   import("./Pages/dashboard/AttributesValue.jsx")
 );
 
+const Qualities = lazy(() => import("./Pages/dashboard/Qualities.jsx"));
+
+const Products = lazy(() => import("./Pages/dashboard/Products.jsx"));
+
+const AddProduct = lazy(() => import("./components/AddProductComponent.jsx"));
+
+const EditProduct = lazy(() => import("./components/EditProductComponent.jsx"));
+
 function App() {
   const [count, setCount] = useState(0);
 
@@ -47,11 +55,27 @@ function App() {
                 element={<SubChildCategory />}
               />
 
-              <Route path="/categories/attributes" element={<Attributes />} />
+              <Route path="/attributes" element={<Attributes />} />
 
               <Route
-                path="/categories/attributesvalue/:id"
+                path="/attributes/attributesvalue/:id"
                 element={<AttributesValue />}
+              />
+
+              <Route path="/qualities" element={<Qualities />} />
+
+              <Route path="/products" element={<Products />} />
+
+              <Route path="/products/addproduct" element={<AddProduct />} />
+
+              <Route
+                path="/products/editproduct/:id"
+                element={<EditProduct mode="edit" />}
+              />
+
+              <Route
+                path="/products/viewproduct/:id"
+                element={<EditProduct mode="view" />}
               />
             </Route>
           </Route>

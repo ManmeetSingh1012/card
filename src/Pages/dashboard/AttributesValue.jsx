@@ -15,6 +15,41 @@ export default function AttributesValue() {
 
   const notify = () => toast("Data Updated Successfully !");
 
+  const getParent = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_LOCAL_LINK}/api/getAttributeById/${id}`
+      );
+      const data = response.data;
+      console.log(data);
+      setFlow(data.name);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios
+        .delete(
+          `${import.meta.env.VITE_LOCAL_LINK}/api/deleteAttributeValue/${id}`
+        )
+        .then((response) => {
+          setError("");
+          setChange(!change);
+          console.log(response.data.msg);
+          //setLoading(false);
+        })
+        .catch((error) => {
+          setError(error.message);
+          setLoading(false);
+        });
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [subcategories, setSubCategories] = useState([]);
@@ -24,17 +59,17 @@ export default function AttributesValue() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    getParent();
+
     const fetchAttributeValues = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_LINK}/api//${id}`
+          `${import.meta.env.VITE_LOCAL_LINK}/api/getAttributeValue/${id}`
         );
         const data = response.data;
-
+        setSubCategories(data);
         console.log(data);
-        setSubCategories(response.data[1]);
 
-        setFlow(response.data[0]);
         setcardcount(data.length);
         //dispatch(add(response.data[0]));
       } catch (error) {
@@ -53,8 +88,6 @@ export default function AttributesValue() {
   const [editingItem, setEditingItem] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: "",
-    description: "",
-    imageUrl: "",
   });
   const deletenewcardscount = () => {
     if (newcard.length > 0) {
@@ -68,12 +101,8 @@ export default function AttributesValue() {
     console.log("Editing:", item);
     setEditingItem(item);
     console.log("Editing:", item);
-    const image_url =
-      `${import.meta.env.VITE_LOCAL_LINK}/uploads/` + item.category_image;
     setEditFormData({
       name: item.name,
-      description: item.description,
-      imageUrl: image_url,
     });
   };
 
@@ -82,19 +111,11 @@ export default function AttributesValue() {
     const id = editingItem.id;
     console.log("This is my id", id);
 
-    const form = new FormData();
-
-    form.append("name", editFormData.name);
-    form.append("description", editFormData.description);
-    form.append("category_image", file);
-
-    console.log(form.data);
-
     try {
       await axios
-        .post(
-          `${import.meta.env.VITE_LOCAL_LINK}/api/updateCategory/${id}`,
-          form
+        .put(
+          `${import.meta.env.VITE_LOCAL_LINK}/api/updateAttributeValue/${id}`,
+          editFormData
         )
         .then((response) => {
           console.log(response.data);
@@ -131,7 +152,10 @@ export default function AttributesValue() {
 
     try {
       await axios
-        .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addCategory`, data)
+        .post(
+          `${import.meta.env.VITE_LOCAL_LINK}/api/addAttributeValue/${id}`,
+          data
+        )
         .then((response) => {
           const data = response.data;
           console.log(data);
@@ -197,207 +221,226 @@ export default function AttributesValue() {
     fileInput.click();
   };
 
+  const handleView = (id) => {
+    console.log("View:", id);
+    navigate(`/attributes/attributesvalue/${id}`);
+  };
+
   return (
-    <div className="App bg-slate-100  pt-10">
-      {flow ? (
-        <div className="w-4/5 mx-auto">
-          <nav className="flex" aria-label="Breadcrumb">
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-              <li className="inline-flex items-center">
-                <Link
-                  to="/categories/categoriespage"
-                  className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
-                >
-                  <svg
-                    className="w-3 h-3 mr-2.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
-                  </svg>
-                  Categories
-                </Link>
-              </li>
-              <li>
-                <div className="flex items-center">
-                  <svg
-                    className="w-3 h-3 text-gray-400 mx-1"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m1 9 4-4-4-4"
-                    />
-                  </svg>
-                  <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                    {flow.name}
-                  </span>
-                </div>
-              </li>
-            </ol>
-          </nav>
-        </div>
-      ) : null}
-      <div>
-        <div className="w-4/5 rounded-lg p-3 overflow-hidden mx-auto shadow-lg  bg-white border border-gray-300">
-          <CategoryCard
-            category={subcategories}
-            id={id}
-            flow={flow}
-            setChange={setChange}
-            change={change}
-            handleEdit={handleEdit}
-          />
-        </div>
-
-        <div className="w-4/5 rounded-lg overflow-hidden mx-auto shadow-lg  bg-white border border-gray-300">
-          <table className="min-w-full divide-y divide-gray-200">
-            <tbody className="bg-white divide-y divide-gray-200">
-              {newcard.map((item, i) => (
-                <tr key={item.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {subcategories.length + 1}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <input
-                      type="text"
-                      value={newName}
-                      onChange={(e) => setNewName(e.target.value)}
-                      className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex space-x-2">
-                      <button
-                        className="text-blue-500 hover:text-blue-700"
-                        onClick={addcards}
-                      >
-                        Save
-                      </button>
-                      <button
-                        className="text-red-500 hover:text-red-700"
-                        onClick={deletenewcardscount}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {editingItem && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-hidden h-full w-full flex items-center justify-center z-50">
-            <div className="relative mx-auto p-5 border w-full max-w-md max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
-              <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
-                Edit Item
-              </h3>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSave();
-                }}
+    <div className="bg-slate-100 w-full h-screen  pt-10">
+      <div className="w-4/5 mx-auto">
+        <nav className="flex" aria-label="Breadcrumb">
+          <ol className="inline-flex items-center">
+            <li className="inline-flex items-center">
+              <Link
+                to="/attributes"
+                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
               >
-                <div className="mb-4">
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    value={editFormData.name}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full pl-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                <svg
+                  className="w-4 h-4 mr-2"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z" />
+                </svg>
+                Attributes
+              </Link>
+            </li>
+
+            <li>
+              <div className="flex items-center">
+                <svg
+                  className="w-3 h-3 text-gray-400 mx-1"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 9 4-4-4-4"
                   />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    id="description"
-                    value={editFormData.description}
-                    onChange={handleInputChange}
-                    rows="4"
-                    className="mt-1 block w-full pl-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  ></textarea>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Image
-                  </label>
-                  <div className="mt-1 flex flex-col items-center">
-                    <div className="w-64 h-64 border-2 border-gray-300 border-dashed rounded-lg p-2 flex items-center justify-center">
-                      {editFormData.imageUrl ? (
-                        <img
-                          src={editFormData.imageUrl}
-                          alt="Current"
-                          className="max-w-full max-h-full object-contain"
-                        />
-                      ) : (
-                        <svg
-                          className="w-12 h-12 text-gray-400"
-                          stroke="currentColor"
-                          fill="none"
-                          viewBox="0 0 48 48"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      )}
-                    </div>
+                </svg>
+                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+                  {flow}
+                </span>
+              </div>
+            </li>
+          </ol>
+        </nav>
+      </div>
+
+      <div className="w-4/5 rounded-lg overflow-hidden mx-auto shadow-lg p-3 bg-white border border-gray-300">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Sr No
+              </th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {Object.values(subcategories).map((item, i) => (
+              <tr key={item.id}>
+                <td className="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-500">
+                  {i + 1}
+                </td>
+
+                <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
+                  {item.name}
+                </td>
+                <td className="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-900">
+                  <div className="flex justify-end space-x-2">
                     <button
-                      type="button"
-                      onClick={handleImageChange}
-                      className="mt-2 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      onClick={() => handleEdit(item)}
+                      className="text-blue-500 hover:text-blue-700"
                     >
-                      Change Image
+                      <svg
+                        class="w-6 h-6 text-gray-800 "
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <svg
+                        class="w-6 h-6 text-gray-800 "
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                        />
+                      </svg>
                     </button>
                   </div>
-                </div>
-                <div className="mt-4 flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+
+      <div className="w-4/5 rounded-lg overflow-hidden mx-auto shadow-lg  bg-white border border-gray-300">
+        <table className="min-w-full divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-200">
+            {newcard.map((item, i) => (
+              <tr key={item.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {cardcount + 1}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div className="flex space-x-2">
+                    <button
+                      className="text-blue-500 hover:text-blue-700"
+                      onClick={addcards}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="text-red-500 hover:text-red-700"
+                      onClick={deletenewcardscount}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {editingItem && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-hidden h-full w-full flex items-center justify-center z-50">
+          <div className="relative mx-auto p-5 border w-full max-w-md max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+              Edit Item
+            </h3>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}
+            >
+              <div className="mb-4">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={editFormData.name}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full pl-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+
+              <div className="mt-4 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="w-4/5 mx-auto py-5">
         <div
