@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const { id, child_id } = useParams();
+  const { variant_id } = useParams();
 
   const token = useSelector((state) => state.user.token);
   console.log(token);
@@ -142,7 +143,9 @@ export default function Dashboard() {
                 to="/qualities"
                 className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${isActive(
                   "/qualities"
-                )}`}
+                )}
+                
+               `}
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -171,7 +174,9 @@ export default function Dashboard() {
                   ${isActive("/products")}
                   ${isActive(`/products/editproduct/${id}`)}
                   ${isActive(`/products/viewproduct/${id}`)}
-                 
+                  ${isActive(`/products/${id}/variants`)}
+                  ${isActive(`/products/${id}/variants/addvariant`)}
+                  ${isActive(`/products/${id}/variants/${variant_id}`)}
                 `}
               >
                 <svg

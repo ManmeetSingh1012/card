@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import CategoryCard from "../../components/CategoryCard";
+import CategoryCard from "../../../components/CategoryCard";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";

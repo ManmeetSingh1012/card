@@ -7,28 +7,37 @@ import PrivateRoute from "./utility/PrivateRoute.jsx";
 const Login = lazy(() => import("./Pages/Login.jsx"));
 const Dashboard = lazy(() => import("./Pages/Dashboard.jsx"));
 const Home = lazy(() => import("./Pages/dashboard/Home.jsx"));
+
 const SubChildCategory = lazy(() =>
-  import("./Pages/dashboard/SubChildCategory.jsx")
+  import("./Pages/dashboard/category/SubChildCategory.jsx")
 );
 
-const ChildCategory = lazy(() => import("./Pages/dashboard/ChildCategory.jsx"));
+const ChildCategory = lazy(() =>
+  import("./Pages/dashboard/category/ChildCategory.jsx")
+);
 
 const Landing = lazy(() => import("./Pages/Landing.jsx"));
 const DefaultPage = lazy(() => import("./Pages/dashboard/Default.jsx"));
 
-const Variant = lazy(() => import("./Pages/dashboard/Variant.jsx"));
+const Variant = lazy(() => import("./Pages/dashboard/variants/Variant.jsx"));
 
-const AddVariant = lazy(() => import("./Pages/dashboard/AddVariant.jsx"));
-
-const Attributes = lazy(() => import("./Pages/dashboard/Attributes.jsx"));
-
-const AttributesValue = lazy(() =>
-  import("./Pages/dashboard/AttributesValue.jsx")
+const AddVariant = lazy(() =>
+  import("./Pages/dashboard/variants/AddVariant.jsx")
 );
 
-const Qualities = lazy(() => import("./Pages/dashboard/Qualities.jsx"));
+const Attributes = lazy(() =>
+  import("./Pages/dashboard/attribute/Attributes.jsx")
+);
 
-const Products = lazy(() => import("./Pages/dashboard/Products.jsx"));
+const AttributesValue = lazy(() =>
+  import("./Pages/dashboard/attribute/AttributesValue.jsx")
+);
+
+const Qualities = lazy(() =>
+  import("./Pages/dashboard/qualities/Qualities.jsx")
+);
+
+const Products = lazy(() => import("./Pages/dashboard/product/Products.jsx"));
 
 const AddProduct = lazy(() => import("./components/AddProductComponent.jsx"));
 
@@ -39,7 +48,13 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center h-screen">
+            Loading...
+          </div>
+        }
+      >
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />

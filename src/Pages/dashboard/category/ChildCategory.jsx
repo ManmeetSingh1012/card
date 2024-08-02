@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import CategoryCard from "../../components/CategoryCard";
+import CategoryCard from "../../../components/CategoryCard";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { add } from "../../Redux/authslice";
+import { add } from "../../../Redux/authslice";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";

@@ -10,6 +10,11 @@ export default function AddVariant({ mode }) {
   const [attribute_id, setAttribute_id] = useState(null);
   const navigate = useNavigate();
   const { id, variant_id } = useParams();
+  const [check, setcheck] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    display_type: "", // Changed default to checkbox
+  });
 
   const fetchProductAttribute = async () => {
     try {
@@ -126,7 +131,7 @@ export default function AddVariant({ mode }) {
     if (variant_id) {
       fetchVariantDetails();
     }
-  }, [variant_id]);
+  }, [variant_id, check]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -177,6 +182,50 @@ export default function AddVariant({ mode }) {
     } catch (error) {
       console.error("Error submitting form:", error);
     }
+  };
+
+  const handleInputChange2 = (e) => {
+    setEditFormData({
+      ...editFormData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const [editingItem, setEditingItem] = useState(null);
+  const handleCancel = () => {
+    setEditingItem(null);
+  };
+
+  const handleSave = async () => {
+    console.log("fetching data");
+    editFormData.status = 1;
+    try {
+      await axios
+        .post(
+          `${import.meta.env.VITE_LOCAL_LINK}/api/addAttribute`,
+          editFormData
+        )
+        .then((response) => {
+          const data = response.data;
+          console.log(data);
+          // setcardata(data);
+          //setcardcount(data.length);
+          //setchange(!change);
+
+          //setError("");
+          //setLoading(false);
+        })
+        .catch((error) => {
+          //setError(error.message);
+          //setLoading(false);
+        });
+    } catch (error) {
+      //setError(error.message);
+      //setLoading(false);
+    }
+
+    setEditingItem(null);
+    setcheck(!check);
   };
 
   return (
@@ -275,12 +324,37 @@ export default function AddVariant({ mode }) {
           </div>
 
           <div>
-            <label
-              htmlFor="product_attribute"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Product Attribute
-            </label>
+            <div className="flex items-center mb-2">
+              <label
+                htmlFor="product_attribute"
+                className="block text-sm font-medium text-gray-700 mr-2"
+              >
+                Product Attribute
+              </label>
+              <div
+                className="flex items-center text-blue-600 cursor-pointer hover:text-blue-800"
+                onClick={() => {
+                  setEditingItem(true);
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-5 h-5 mr-1"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 4.5v15m7.5-7.5h-15"
+                  />
+                </svg>
+                <span className="text-sm font-medium">Add</span>
+              </div>
+            </div>
+
             <select
               name="product_attribute"
               id="product_attribute"
@@ -296,6 +370,7 @@ export default function AddVariant({ mode }) {
               ))}
             </select>
           </div>
+
           <div>
             <label
               htmlFor="product_attribute_value"
@@ -346,6 +421,73 @@ export default function AddVariant({ mode }) {
           </div>
         </form>
       </div>
+
+      {editingItem && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-hidden h-full w-full flex items-center justify-center z-50">
+          <div className="relative mx-auto p-5 border w-full max-w-md max-h-[90vh] shadow-lg rounded-md bg-white overflow-y-auto">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+              Edit Item
+            </h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}
+            >
+              <div className="mb-4">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={editFormData.name}
+                  onChange={handleInputChange2}
+                  className="mt-1 block w-full pl-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="display_type"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Display Type
+                </label>
+                <select
+                  name="display_type"
+                  id="display_type"
+                  value={editFormData.display_type}
+                  onChange={handleInputChange2}
+                  className="mt-1 block w-full pl-1 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                >
+                  <option value="checkbox">Checkbox</option>
+                  <option value="radio">Radio</option>
+                  <option value="select">Select</option>
+                </select>
+              </div>
+              <div className="mt-4 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

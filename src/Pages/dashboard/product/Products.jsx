@@ -21,6 +21,8 @@ export default function Products() {
     image_url: "",
     // Changed default to checkbox
   });
+
+  const [count, setCount] = useState(null);
   const [currentpage, setcurrentpage] = useState(1);
 
   // this will be the index of the first element on the page.
