@@ -16,6 +16,10 @@ const ChildCategory = lazy(() => import("./Pages/dashboard/ChildCategory.jsx"));
 const Landing = lazy(() => import("./Pages/Landing.jsx"));
 const DefaultPage = lazy(() => import("./Pages/dashboard/Default.jsx"));
 
+const Variant = lazy(() => import("./Pages/dashboard/Variant.jsx"));
+
+const AddVariant = lazy(() => import("./Pages/dashboard/AddVariant.jsx"));
+
 const Attributes = lazy(() => import("./Pages/dashboard/Attributes.jsx"));
 
 const AttributesValue = lazy(() =>
@@ -69,13 +73,24 @@ function App() {
               <Route path="/products/addproduct" element={<AddProduct />} />
 
               <Route
-                path="/products/editproduct/:id"
-                element={<EditProduct mode="edit" />}
+                path="/products/viewproduct/:id"
+                element={<EditProduct mode="view" />}
               />
 
               <Route
-                path="/products/viewproduct/:id"
-                element={<EditProduct mode="view" />}
+                path="/products/editproduct/:id"
+                element={<EditProduct mode="edit" />}
+              />
+              <Route path="/products/:id/variants" element={<Variant />} />
+
+              <Route
+                path="/products/:id/variants/:variant_id"
+                element={<AddVariant mode="edit" />}
+              />
+
+              <Route
+                path="/products/:id/variants/addvariant"
+                element={<AddVariant mode="add" />}
               />
             </Route>
           </Route>

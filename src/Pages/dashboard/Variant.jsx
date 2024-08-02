@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { set, useForm } from "react-hook-form";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-export default function Products() {
+export default function Variant() {
   const [loading, setLoading] = useState(false);
+  const [productName, setProductName] = useState("");
   const [card, setcardata] = useState([]);
   const [newcard, setnewcard] = useState([]);
   const [error, setError] = useState("");
@@ -19,8 +20,13 @@ export default function Products() {
     name: "",
     description: "",
     image_url: "",
+    extra_price: "",
+    product_id: "",
+    product_attribute_value_id: " ",
     // Changed default to checkbox
   });
+  const { id } = useParams();
+
   const [currentpage, setcurrentpage] = useState(1);
 
   // this will be the index of the first element on the page.
@@ -44,10 +50,14 @@ export default function Products() {
     console.log("fetching data");
     try {
       await axios
-        .get(`${import.meta.env.VITE_LOCAL_LINK}/api/getProducts`)
+        .get(
+          `${
+            import.meta.env.VITE_LOCAL_LINK
+          }/api/getProductVariantByProductId/${id}`
+        )
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          console.log(`Variants` + data);
           setcardata(data);
           setcardcount(data.length);
 
@@ -64,9 +74,51 @@ export default function Products() {
     }
   };
 
+  const fetchParentProduct = async () => {
+    try {
+      await axios
+        .get(`${import.meta.env.VITE_LOCAL_LINK}/api/getProductById/${id}`)
+        .then((response) => {
+          const data = response.data;
+          console.log(data);
+          console.log(`Parent ${data.name}`);
+          setProductName(data.name);
+          setError("");
+          setLoading(false);
+        })
+        .catch((error) => {
+          setError(error.message);
+          setLoading(false);
+        });
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  const calculatepage = () => {
+    const length = card.length;
+    const pages = Math.ceil(length / 2);
+    setpage(pages);
+
+    console.log("Pages:", pages);
+  };
+
+  const newcurrentpage = () => {
+    if (card.length <= startindex) {
+      setcurrentpage(currentpage - 1);
+      setstartindex(startindex - 2);
+    }
+  };
+
+  useEffect(() => {
+    calculatepage();
+  }, [card]);
+
   useEffect(() => {
     console.log("Fetching data", import.meta.env.VITE_LOCAL_LINK);
     fetchdata();
+    fetchParentProduct();
   }, [change]);
 
   const {
@@ -79,11 +131,11 @@ export default function Products() {
   } = useForm({});
 
   const addnewcards = () => {
-    navigate("/products/addproduct");
+    navigate(`/products/${id}/variants/addvariant`);
   };
 
   const handleEdit = (item) => {
-    navigate(`/products/editproduct/${item.id}`);
+    navigate(`/products/${id}/variants/${item.id}`);
     console.log("Editing:", item);
     setEditingItem(item);
     console.log("Editing:", item);
@@ -98,7 +150,9 @@ export default function Products() {
   const handleDelete = async (id) => {
     try {
       await axios
-        .delete(`${import.meta.env.VITE_LOCAL_LINK}/api/deleteProduct/${id}`)
+        .delete(
+          `${import.meta.env.VITE_LOCAL_LINK}/api/deleteProductVariant/${id}`
+        )
         .then((response) => {
           setError("");
           setchange(!change);
@@ -119,23 +173,6 @@ export default function Products() {
     console.log("View:", id);
     navigate(`/products/viewproduct/${id}`);
   };
-
-  const handleVariant = (id) => {
-    console.log("View Variant:", id);
-    navigate(`/products/${id}/variants`);
-  };
-
-  const calculatepage = () => {
-    const length = card.length;
-    const pages = Math.ceil(length / 2);
-    setpage(pages);
-
-    console.log("Pages:", pages);
-  };
-
-  useEffect(() => {
-    calculatepage();
-  }, [card]);
 
   const prev = () => {
     if (currentpage > 1) {
@@ -173,6 +210,29 @@ export default function Products() {
                 </svg>
                 Products
               </Link>
+            </li>
+
+            <li>
+              <div className="flex items-center">
+                <svg
+                  className="w-3 h-3 text-gray-400 mx-1"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 9 4-4-4-4"
+                  />
+                </svg>
+                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+                  {productName}
+                </span>
+              </div>
             </li>
           </ol>
         </nav>
@@ -294,46 +354,6 @@ export default function Products() {
                             stroke-linejoin="round"
                             stroke-width="2"
                             d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleView(item.id)}
-                        className="text-green-500 hover:text-green-700"
-                      >
-                        <svg
-                          class="w-6 h-6 text-gray-800 "
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill-rule="evenodd"
-                            d="M3.559 4.544c.355-.35.834-.544 1.33-.544H19.11c.496 0 .975.194 1.33.544.356.35.559.829.559 1.331v9.25c0 .502-.203.981-.559 1.331-.355.35-.834.544-1.33.544H15.5l-2.7 3.6a1 1 0 0 1-1.6 0L8.5 17H4.889c-.496 0-.975-.194-1.33-.544A1.868 1.868 0 0 1 3 15.125v-9.25c0-.502.203-.981.559-1.331ZM7.556 7.5a1 1 0 1 0 0 2h8a1 1 0 0 0 0-2h-8Zm0 3.5a1 1 0 1 0 0 2H12a1 1 0 1 0 0-2H7.556Z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                      </button>
-
-                      <button
-                        onClick={() => handleVariant(item.id)}
-                        className="text-green-500 hover:text-green-700"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="size-6 text-gray-800"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M12 4.5v15m7.5-7.5h-15"
                           />
                         </svg>
                       </button>

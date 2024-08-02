@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
 // import http from "../services/axiosintercepters";
 import { useSelector } from "react-redux";
 import { Outlet, Link, Navigate, useLocation } from "react-router-dom";
@@ -9,11 +10,13 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
+  const { id, child_id } = useParams();
 
   const token = useSelector((state) => state.user.token);
   console.log(token);
 
   const location = useLocation();
+  console.log(location.pathname);
 
   const isActive = (path) => {
     return location.pathname === path ? "bg-gray-100 dark:bg-gray-700" : "";
@@ -79,9 +82,12 @@ export default function Dashboard() {
             <li>
               <Link
                 to="/categories/categoriespage"
-                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${isActive(
-                  "/categories/categoriespage"
-                )}`}
+                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group 
+                  ${isActive("/categories/categoriespage")}
+                  ${isActive(`/categories/childcategory/${id}`)}
+                  ${isActive(`/categories/${id}/${child_id}`)}
+          
+                `}
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -106,9 +112,10 @@ export default function Dashboard() {
             <li>
               <Link
                 to="/attributes"
-                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${isActive(
-                  "/categories/attributes"
-                )}`}
+                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group
+                   ${isActive("/attributes")}
+                   ${isActive(`/attributes/attributesvalue/${id}`)}
+                `}
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -160,9 +167,12 @@ export default function Dashboard() {
             <li>
               <Link
                 to="/products"
-                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${isActive(
-                  "/products"
-                )}`}
+                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group 
+                  ${isActive("/products")}
+                  ${isActive(`/products/editproduct/${id}`)}
+                  ${isActive(`/products/viewproduct/${id}`)}
+                 
+                `}
               >
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
