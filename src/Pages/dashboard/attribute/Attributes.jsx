@@ -35,6 +35,7 @@ export default function Attributes() {
   const [file, setfile] = useState(null);
 
   const fetchdata = async () => {
+    setLoading(true);
     console.log("fetching data");
     try {
       await axios
@@ -59,6 +60,7 @@ export default function Attributes() {
   };
 
   const savedata = async (data) => {
+    setLoading(true);
     console.log("fetching data");
     try {
       await axios
@@ -123,6 +125,7 @@ export default function Attributes() {
   };
 
   const handleDelete = async (id) => {
+    setLoading(true);
     try {
       await axios
         .delete(`${import.meta.env.VITE_LOCAL_LINK}/api/deleteAttribute/${id}`)
@@ -130,7 +133,7 @@ export default function Attributes() {
           setError("");
           setchange(!change);
           console.log(response.data.msg);
-          //setLoading(false);
+          setLoading(false);
         })
         .catch((error) => {
           setError(error.message);
@@ -148,6 +151,7 @@ export default function Attributes() {
   };
 
   const handleSave = async () => {
+    setLoading(true);
     console.log("Saving:", editFormData);
 
     if (editFormData.display_type == "") {
@@ -168,17 +172,17 @@ export default function Attributes() {
         .then((response) => {
           console.log(response.data.msg);
           setchange(!change);
-          //setLoading(false);
+          setLoading(false);
           toast("Wow so easy!");
         })
         .catch((error) => {
           console.log(error);
 
-          //setLoading(false);
+          setLoading(false);
         });
     } catch (error) {
       console.log(error);
-      //setLoading(false);
+      setLoading(false);
     }
 
     console.log("Saving After:", editFormData);
@@ -215,7 +219,9 @@ export default function Attributes() {
     }
   };
 
-  return (
+  return loading ? (
+    <div className="flex justify-center items-center h-screen">Loading...</div>
+  ) : (
     <div className="bg-slate-100 w-full h-screen  pt-10">
       <div className="w-4/5 mx-auto">
         <nav className="flex" aria-label="Breadcrumb">

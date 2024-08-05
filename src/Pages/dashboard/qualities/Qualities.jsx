@@ -34,6 +34,7 @@ export default function Qualities() {
   const [file, setfile] = useState(null);
 
   const fetchdata = async () => {
+    setLoading(true);
     console.log("fetching data");
     try {
       await axios
@@ -202,7 +203,9 @@ export default function Qualities() {
     }
   };
 
-  return (
+  return loading ? (
+    <div className="flex justify-center items-center h-screen">Loading...</div>
+  ) : (
     <div className="bg-slate-100 w-full min-h-screen pt-10">
       <div className="w-4/5 mx-auto">
         <nav className="flex" aria-label="Breadcrumb">

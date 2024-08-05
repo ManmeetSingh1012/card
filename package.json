@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.6",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "axios": "^1.7.2",
     "install": "^0.13.0",
     "npm": "^10.8.2",

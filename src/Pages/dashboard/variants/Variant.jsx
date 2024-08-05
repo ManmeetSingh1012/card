@@ -47,6 +47,7 @@ export default function Variant() {
   const [file, setfile] = useState(null);
 
   const fetchdata = async () => {
+    setLoading(true);
     console.log("fetching data");
     try {
       await axios
@@ -189,8 +190,12 @@ export default function Variant() {
     }
   };
 
-  return (
-    <div className="bg-slate-100 w-full   pt-10">
+  return loading ? (
+    <div className="flex justify-center items-center min-h-screen">
+      Loading...
+    </div>
+  ) : (
+    <div className="bg-slate-100 w-full  min-h-screen  pt-10">
       <div className="w-11/12 mx-auto">
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex items-center">
@@ -239,130 +244,136 @@ export default function Variant() {
       </div>
 
       <div className="w-11/12 rounded-lg overflow-hidden mx-auto shadow-lg p-3 bg-white border border-gray-300">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Sr No
-              </th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Sr No
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
 
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Image
-              </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Image
+                </th>
 
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
-              </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Description
+                </th>
 
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {Object.values(card)
-              .slice(startindex, startindex + 2)
-              .map((item, i) => (
-                <tr key={item.id}>
-                  <td className="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-500">
-                    {startindex + 1 + i}
-                  </td>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {Object.values(card)
+                .slice(startindex, startindex + 2)
+                .map((item, i) => (
+                  <tr key={item.id}>
+                    <td className="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-500">
+                      {startindex + 1 + i}
+                    </td>
 
-                  <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
-                    {item.name}
-                  </td>
+                    <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
+                      {item.name}
+                    </td>
 
-                  <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
-                    <div className="mb-4">
-                      <div className="mt-1 flex flex-col items-center">
-                        <div className="w-40 h-40 border-2 border-gray-300 border-dashed rounded-lg p-2 flex items-center justify-center">
-                          {item.product_image ? (
-                            <img
-                              src={`${
-                                import.meta.env.VITE_LOCAL_LINK
-                              }/uploads/${item.product_image}`}
-                              alt={item.name}
-                              className="max-w-full max-h-full object-contain"
-                            />
-                          ) : (
-                            <svg
-                              className="w-12 h-12 text-gray-400"
-                              stroke="currentColor"
-                              fill="none"
-                              viewBox="0 0 48 48"
-                              aria-hidden="true"
-                            >
-                              <path
-                                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                strokeWidth={2}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                    <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
+                      <div className="mb-4">
+                        <div className="mt-1 flex flex-col items-center">
+                          <div className="w-40 h-40 border-2 border-gray-300 border-dashed rounded-lg p-2 flex items-center justify-center">
+                            {item.product_image ? (
+                              <img
+                                src={`${
+                                  import.meta.env.VITE_LOCAL_LINK
+                                }/uploads/${item.product_image}`}
+                                alt={item.name}
+                                className="max-w-full max-h-full object-contain"
                               />
-                            </svg>
-                          )}
+                            ) : (
+                              <svg
+                                className="w-12 h-12 text-gray-400"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 48 48"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-900">
-                    {item.description}
-                  </td>
-                  <td className="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex justify-end space-x-2">
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <svg
-                          class="w-6 h-6 text-gray-800 "
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      <div className="max-w-xs">
+                        <p className="line-clamp-3 text-left">
+                          {item.description}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right whitespace-nowrap text-sm text-gray-900">
+                      <div className="flex justify-end space-x-2">
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="text-blue-500 hover:text-blue-700"
                         >
-                          <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <svg
-                          class="w-6 h-6 text-gray-800 "
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
+                          <svg
+                            class="w-6 h-6 text-gray-800 "
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="text-red-500 hover:text-red-700"
                         >
-                          <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+                          <svg
+                            class="w-6 h-6 text-gray-800 "
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="w-11/12 mx-auto py-5">
@@ -411,7 +422,7 @@ export default function Variant() {
                 <li>
                   <a
                     href="#"
-                    class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 shadow-lg"
+                    class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700  shadow-lg"
                   >
                     Next
                   </a>

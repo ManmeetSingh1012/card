@@ -48,13 +48,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center h-screen">
-            Loading...
-          </div>
-        }
-      >
+      <Suspense>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />

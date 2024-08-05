@@ -25,20 +25,29 @@ export default function ChildCategory() {
 
   useEffect(() => {
     const fetchCategories = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${id}`
-        );
-        const data = response.data;
+        await axios
+          .get(`${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${id}`)
+          .then((response) => {
+            const data = response.data;
 
-        console.log(data);
-        setSubCategories(response.data[1]);
+            console.log(data);
+            setSubCategories(response.data[1]);
+            setLoading(false);
+            setFlow(response.data[0]);
+            setcardcount(data.length);
+          })
+          .catch(() => {
+            console.log(error);
 
-        setFlow(response.data[0]);
-        setcardcount(data.length);
+            setLoading(false);
+          });
+
         //dispatch(add(response.data[0]));
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false);
       }
     };
 
@@ -79,6 +88,7 @@ export default function ChildCategory() {
 
   const handleSave = async () => {
     // Implement your save logic here
+    setLoading(true);
     const id = editingItem.id;
     console.log("This is my id", id);
 
@@ -99,16 +109,16 @@ export default function ChildCategory() {
         .then((response) => {
           console.log(response.data);
           setChange(!change);
-          //setLoading(false);
+          setLoading(false);
         })
         .catch((error) => {
           console.log(error);
 
-          //setLoading(false);
+          setLoading(false);
         });
     } catch (error) {
       console.log(error);
-      //setLoading(false);
+      setLoading(false);
     }
 
     console.log("Saving:", editFormData);
@@ -125,6 +135,7 @@ export default function ChildCategory() {
   };
 
   const savedata = async (data) => {
+    setLoading(true);
     console.log("fetching data");
 
     data.parent_id = id;
@@ -197,7 +208,9 @@ export default function ChildCategory() {
     fileInput.click();
   };
 
-  return (
+  return loading ? (
+    <div className="flex justify-center items-center h-screen">Loading...</div>
+  ) : (
     <div className="App bg-slate-100 h-screen pt-10">
       {flow ? (
         <div className="w-4/5 mx-auto">

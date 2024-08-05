@@ -16,19 +16,29 @@ export default function AttributesValue() {
   const notify = () => toast("Data Updated Successfully !");
 
   const getParent = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_LOCAL_LINK}/api/getAttributeById/${id}`
-      );
-      const data = response.data;
-      console.log(data);
-      setFlow(data.name);
+      await axios
+        .get(`${import.meta.env.VITE_LOCAL_LINK}/api/getAttributeById/${id}`)
+        .then((response) => {
+          const data = response.data;
+          console.log(data);
+          setFlow(data.name);
+          setLoading(false);
+        })
+        .catch(() => {
+          setError(error.message);
+          setLoading(false);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
+      setError(error.message);
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
+    setLoading(true);
     try {
       await axios
         .delete(
@@ -38,7 +48,7 @@ export default function AttributesValue() {
           setError("");
           setChange(!change);
           console.log(response.data.msg);
-          //setLoading(false);
+          setLoading(false);
         })
         .catch((error) => {
           setError(error.message);
@@ -62,18 +72,27 @@ export default function AttributesValue() {
     getParent();
 
     const fetchAttributeValues = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_LINK}/api/getAttributeValue/${id}`
-        );
-        const data = response.data;
-        setSubCategories(data);
-        console.log(data);
+        const response = await axios
+          .get(`${import.meta.env.VITE_LOCAL_LINK}/api/getAttributeValue/${id}`)
+          .then((response) => {
+            const data = response.data;
+            setSubCategories(data);
+            console.log(data);
+            setLoading(false);
+            setcardcount(data.length);
+          })
+          .catch(() => {
+            console.log(error);
+            setLoading(false);
+          });
 
-        setcardcount(data.length);
         //dispatch(add(response.data[0]));
       } catch (error) {
         console.error("Error fetching data:", error);
+
+        setLoading(false);
       }
     };
 
@@ -107,6 +126,7 @@ export default function AttributesValue() {
   };
 
   const handleSave = async () => {
+    setLoading(true);
     // Implement your save logic here
     const id = editingItem.id;
     console.log("This is my id", id);
@@ -120,16 +140,16 @@ export default function AttributesValue() {
         .then((response) => {
           console.log(response.data);
           setChange(!change);
-          //setLoading(false);
+          setLoading(false);
         })
         .catch((error) => {
           console.log(error);
 
-          //setLoading(false);
+          setLoading(false);
         });
     } catch (error) {
       console.log(error);
-      //setLoading(false);
+      setLoading(false);
     }
 
     console.log("Saving:", editFormData);
@@ -146,6 +166,7 @@ export default function AttributesValue() {
   };
 
   const savedata = async (data) => {
+    setLoading(true);
     console.log("fetching data");
 
     data.parent_id = id;
@@ -226,7 +247,9 @@ export default function AttributesValue() {
     navigate(`/attributes/attributesvalue/${id}`);
   };
 
-  return (
+  return loading ? (
+    <div className="flex justify-center items-center h-screen">Loading...</div>
+  ) : (
     <div className="bg-slate-100 w-full h-screen  pt-10">
       <div className="w-4/5 mx-auto">
         <nav className="flex" aria-label="Breadcrumb">

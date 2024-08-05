@@ -229,7 +229,7 @@ export default function AddVariant({ mode }) {
   };
 
   return (
-    <div className="bg-slate-100 w-full py-5">
+    <div className="bg-slate-100 w-full py-5 min-h-screen">
       <div className="w-4/5  bg-white shadow-md mx-auto p-5 rounded-md">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

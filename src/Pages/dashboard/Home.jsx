@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
+// this is the part of the categories
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [card, setcardata] = useState([]);
@@ -37,6 +39,7 @@ export default function Home() {
 
   const fetchdata = async () => {
     console.log("fetching data");
+    setLoading(true);
     try {
       await axios
         .get(`${import.meta.env.VITE_LOCAL_LINK}/api/parentCategories`)
@@ -62,6 +65,7 @@ export default function Home() {
   // http://159.65.144.232:3400/api/addParentCategory
   const savedata = async (data) => {
     console.log("fetching data");
+    setLoading(true);
     try {
       await axios
         .post(`${import.meta.env.VITE_LOCAL_LINK}/api/addCategory`, data)
@@ -127,6 +131,8 @@ export default function Home() {
   };
 
   const handleDelete = async (id) => {
+    setLoading(true);
+    setLoading(true);
     try {
       await axios
         .delete(`${import.meta.env.VITE_LOCAL_LINK}/api/deleteCategory/${id}`)
@@ -239,7 +245,9 @@ export default function Home() {
     fileInput.click();
   };
 
-  return (
+  return loading ? (
+    <div className="flex justify-center items-center h-screen">Loading...</div>
+  ) : (
     <div className="bg-slate-100 w-full min-h-screen pt-10">
       <div className="w-4/5 mx-auto">
         <nav className="flex" aria-label="Breadcrumb">

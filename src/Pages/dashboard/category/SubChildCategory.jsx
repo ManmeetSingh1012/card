@@ -30,30 +30,48 @@ export default function ChildCategory() {
 
   const fetchParentName = async () => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${id}`
-      );
-
-      setParentName(response.data[0].name);
+      await axios
+        .get(`${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${id}`)
+        .then((response) => {
+          setParentName(response.data[0].name);
+          setLoading(false);
+        })
+        .catch(() => {
+          console.log(error);
+          setLoading(false);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
+      console.log(error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchCategories = async () => {
+      setLoading(true);
+
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${child_id}`
-        );
+        await axios
+          .get(
+            `${import.meta.env.VITE_LOCAL_LINK}/api/childCategories/${child_id}`
+          )
+          .then((response) => {
+            console.log(response.data);
+            setSubCategories(response.data[1]);
 
-        console.log(response.data);
-        setSubCategories(response.data[1]);
+            console.log(response.data[1].length);
+            setFlow([response.data[0]]);
 
-        console.log(response.data[1].length);
-        setFlow([response.data[0]]);
+            setLoading(false);
+          })
+          .catch(() => {
+            console.log(error);
+            setLoading(false);
+          });
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false);
       }
     };
     fetchParentName();
@@ -208,7 +226,9 @@ export default function ChildCategory() {
     };
     fileInput.click();
   };
-  return (
+  return loading ? (
+    <div className="flex justify-center items-center h-screen">Loading...</div>
+  ) : (
     <div className="App bg-slate-100 h-screen  pt-10">
       <div className="w-4/5 mx-auto">
         {Object.values(flow).map((item, i) => (
